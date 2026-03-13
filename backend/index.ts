@@ -1,33 +1,40 @@
 import pkg from "@prisma/client";
 const { PrismaClient } = pkg;
+import pkgPg from "pg";
+const { Pool } = pkgPg;
+import { PrismaPg } from "@prisma/adapter-pg";
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
 
 const app = express();
-
-// Prisma 7 lira automatiquement ton fichier prisma.config.ts
-const prisma = new PrismaClient();
-
 const PORT = Number(process.env.PORT) || 3000;
+
+// Configuration de la connexion
+const connectionString = process.env.DATABASE_URL;
+
+// On force le type 'any' ici pour stopper la guerre entre les versions de @types/pg
+const pool = new Pool({ connectionString }) as any;
+const adapter = new PrismaPg(pool);
+
+const prisma = new PrismaClient({ adapter });
 
 app.use(cors());
 app.use(express.json());
 
-// Route pour récupérer tes fruits
 app.get("/", async (req, res) => {
   try {
     const allFruits = await prisma.devilFruit.findMany();
     res.json(allFruits);
   } catch (error) {
-    console.error(error); // Utile pour voir l'erreur exacte dans les logs Dokploy
-    res
-      .status(500)
-      .json({ error: "Erreur lors de la récupération des fruits" });
+    console.error("Erreur Prisma:", error);
+    res.status(500).json({
+      error: "Erreur lors de la récupération des fruits",
+      details: error instanceof Error ? error.message : "Erreur inconnue",
+    });
   }
 });
 
-// Important : le "0.0.0.0" permet à Dokploy d'exposer le service correctement
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Punk Records API lancée sur le port ${PORT}`);
 });

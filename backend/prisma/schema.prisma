@@ -1,12 +1,13 @@
 // schema.prisma — PUNK RECORDS DATABASE
 // Dr. Vegapunk Devil Fruit Classification System
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 model DevilFruit {
