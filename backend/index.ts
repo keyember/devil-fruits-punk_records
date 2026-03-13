@@ -1,5 +1,6 @@
+import pkg from "@prisma/client";
+const { PrismaClient } = pkg;
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import "dotenv/config";
 
