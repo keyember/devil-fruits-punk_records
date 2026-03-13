@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import TerminalLayout from "./components/TerminalLayout";
 
-const API_URL = "http://localhost:3000/api/fruits";
+const API_URL = "https://api-fruits.oudinallan.dev/";
 
 function App() {
   const [fruits, setFruits] = useState([]);
