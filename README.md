@@ -33,7 +33,7 @@ Projet personnel / proof-of-concept – v0.1 (mars 2026)
 
 ### Prérequis
 
-- Node.js ≥ 18
+- Node.js ≥ 20
 - PostgreSQL (local ou hébergé – ex: Supabase, Neon, Railway)
 - pnpm (fortement recommandé)
 
