@@ -16,4 +16,7 @@
     "@types/pg": "^8.18.0"
   },
   "type": "module"
+  "scripts": {
+    "start": "node index.js" 
+  },
 }
