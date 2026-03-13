@@ -15,7 +15,7 @@
     "@types/node": "^25.5.0",
     "@types/pg": "^8.18.0"
   },
-  "type": "module"
+  "type": "module",
   "scripts": {
     "start": "node index.js" 
   },
