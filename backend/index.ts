@@ -1,18 +1,27 @@
+import express from "express";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import cors from "cors";
 import "dotenv/config";
 
-const connectionString = process.env.DATABASE_URL!;
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+const app = express();
+const prisma = new PrismaClient();
+const PORT = Number(process.env.PORT) || 3000;
 
-async function main() {
-  console.log("🧬 PUNK RECORDS : Tentative de connexion...");
-  const allFruits = await prisma.devilFruit.findMany();
-  console.log("✅ Connexion réussie !");
-  console.log(`Données archivées : ${allFruits.length} fruits.`);
-}
+app.use(cors());
+app.use(express.json());
 
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+// Route pour récupérer tes fruits
+app.get("/", async (req, res) => {
+  try {
+    const allFruits = await prisma.devilFruit.findMany();
+    res.json(allFruits);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des fruits" });
+  }
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Punk Records API lancée sur http://0.0.0.0:${PORT}`);
+});
