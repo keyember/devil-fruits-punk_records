@@ -1,0 +1,42 @@
+// schema.prisma — PUNK RECORDS DATABASE
+// Dr. Vegapunk Devil Fruit Classification System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model DevilFruit {
+  id             String   @id @default(cuid())
+  originalName   String   @unique   // Ex: "Mera Mera no Mi"
+  translatedName String             // Ex: "Fruit du Feu"
+  type           FruitType          // PARAMECIA | LOGIA | ZOAN
+  description    String   @db.Text
+  ability        String   @db.Text
+  imageUrl       String?
+  rarity         Rarity   @default(COMMON)
+  user           String?            // Utilisateur connu (ex: Portgas D. Ace)
+  bounty         String?            // Prime en Berrys (format string: "3 000 000 000")
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("devil_fruits")
+}
+
+enum FruitType {
+  Paramecia
+  Logia
+  Zoan
+}
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  LEGENDARY
+  MYTHIC
+}

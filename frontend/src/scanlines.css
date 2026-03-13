@@ -1,0 +1,169 @@
+/* scanlines.css — PUNK RECORDS DATABASE
+   Effet "moniteur CRT de Vegapunk"
+   Importer dans index.css ou App.css : @import './scanlines.css';
+   Ajouter className="scanlines" sur le div racine.
+*/
+
+/* ── SCANLINES (lignes horizontales CRT) ─────────────────────────────────────
+   Recouvre tout l'écran avec des lignes semi-transparentes.
+   pointer-events: none → ne bloque pas les interactions. */
+.scanlines {
+  position: relative;
+  isolation: isolate;
+}
+
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+
+  /* Lignes horizontales toutes les 4px (2px opaque, 2px transparent) */
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.18) 2px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+}
+
+/* ── VIGNETTE CRT (bords sombres) ────────────────────────────────────────────
+   Simule la courbe et l'atténuation lumineuse d'un tube cathodique. */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.65) 100%
+  );
+}
+
+/* ── SCAN LINE ANIMÉE (bande lumineuse qui défile) ───────────────────────────
+   Ajouter <div class="scan-beam"></div> comme premier enfant du .scanlines. */
+.scan-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 136, 0.25) 40%,
+    rgba(0, 204, 255, 0.35) 50%,
+    rgba(0, 255, 136, 0.25) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 9997;
+  animation: crt-scan 5s linear infinite;
+}
+
+@keyframes crt-scan {
+  0%   { top: -2px; opacity: 0.8; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ── PHOSPHOR FLICKER (légère pulsation de luminosité) ──────────────────────
+   Optionnel — ajouter la classe .crt-flicker pour activer. */
+.crt-flicker {
+  animation: phosphor-flicker 8s step-end infinite;
+}
+
+@keyframes phosphor-flicker {
+  0%,  100% { opacity: 1; }
+  92%        { opacity: 1; }
+  92.5%      { opacity: 0.94; }
+  93%        { opacity: 1; }
+  95%        { opacity: 0.97; }
+  95.5%      { opacity: 1; }
+  97%        { opacity: 0.95; }
+  97.5%      { opacity: 1; }
+}
+
+/* ── GLITCH TEXT ANIMATION ───────────────────────────────────────────────────
+   Utilisé sur les items de la sidebar au survol. */
+@keyframes glitch {
+  0%   { transform: translate(0, 0);    clip-path: none; }
+  15%  { transform: translate(-3px, 1px); clip-path: inset(10% 0 75% 0); }
+  30%  { transform: translate(3px, -1px); clip-path: inset(65% 0 5% 0); }
+  45%  { transform: translate(-1px, 0px); clip-path: inset(40% 0 40% 0); }
+  60%  { transform: translate(2px, 1px);  clip-path: none; }
+  75%  { transform: translate(-1px, 0);   clip-path: inset(20% 0 60% 0); }
+  100% { transform: translate(0, 0);    clip-path: none; }
+}
+
+.animate-glitch {
+  animation: glitch 0.35s linear;
+}
+
+/* ── BLINK CURSOR ─────────────────────────────────────────────────────────── */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: cursor-blink 1s step-end infinite;
+}
+
+/* ── DECODE IN (apparition panel central) ───────────────────────────────────
+   Appliqué via Framer Motion dans TerminalLayout.jsx,
+   mais version CSS pure disponible ici si besoin. */
+@keyframes decode-in {
+  0%   { opacity: 0; filter: blur(6px); transform: translateY(6px); }
+  35%  { opacity: 0.5; filter: blur(3px); }
+  70%  { opacity: 0.85; filter: blur(1px); }
+  100% { opacity: 1; filter: none; transform: translateY(0); }
+}
+
+.decode-in {
+  animation: decode-in 0.55s ease forwards;
+}
+
+/* ── SCANLINE VERTICAL (optional: colonnes CRT comme vieux terminaux) ────── */
+.scanlines-vertical::before {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.07) 3px,
+    rgba(0, 0, 0, 0.07) 4px
+  );
+}
+
+/* ── NEON TEXT GLOW UTILITIES ────────────────────────────────────────────────
+   Classes utilitaires pour les textes lumineux. */
+.neon-green  { text-shadow: 0 0 6px rgba(74, 222, 128, 0.8),  0 0 14px rgba(74, 222, 128, 0.4); }
+.neon-cyan   { text-shadow: 0 0 6px rgba(34, 211, 238, 0.8),  0 0 14px rgba(34, 211, 238, 0.4); }
+.neon-orange { text-shadow: 0 0 6px rgba(251, 146, 60, 0.8),  0 0 14px rgba(251, 146, 60, 0.4); }
+.neon-purple { text-shadow: 0 0 6px rgba(192, 132, 252, 0.8), 0 0 14px rgba(192, 132, 252, 0.4); }
+
+/* ── Tailwind custom animation (ajouter dans tailwind.config.js) ─────────────
+
+  // tailwind.config.js
+  module.exports = {
+    theme: {
+      extend: {
+        keyframes: {
+          'scan-line': {
+            '0%':   { top: '0%' },
+            '100%': { top: '100%' },
+          },
+          'glitch': { ... },
+        },
+        animation: {
+          'scan-line': 'scan-line 4s linear infinite',
+          'glitch': 'glitch 0.35s linear',
+        }
+      }
+    }
+  }
+*/

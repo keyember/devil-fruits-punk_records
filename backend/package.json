@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "axios": "^1.13.6",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "framer-motion": "^12.36.0",
+    "node-fetch": "^3.3.2",
+    "prisma": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "@types/pg": "^8.18.0"
+  },
+  "type": "module"
+}
