@@ -9,7 +9,7 @@
 **Devil Fruits × Punk Records** est une petite application full-stack inspirée de l'univers de **One Piece** (arc Egghead / Punk Records).  
 Elle propose un terminal rétro-CRT style Vegapunk pour consulter une base de données de **Fruits du Démon** (Akuma no Mi), avec un design immersif "moniteur scientifique de Punk Records".
 
-Projet personnel / proof-of-concept – v0.1 (mars 2026)
+Preview disponible ici -> https://fruits.oudinallan.dev/
 
 ## Fonctionnalités actuelles (v0.1)
 
