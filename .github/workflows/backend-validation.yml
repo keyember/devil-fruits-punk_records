@@ -14,6 +14,8 @@ permissions:
 jobs:
   validate-backend:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/punk_record
     defaults:
       run:
         working-directory: backend
