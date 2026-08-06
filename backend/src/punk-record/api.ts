@@ -1,13 +1,13 @@
 import type { PrismaClient } from '@prisma/client';
 
-export type PunkRecordListQuery = {
+export type DevilFruitListQuery = {
   page?: number;
   limit?: number;
   search?: string;
-  category?: string;
+  type?: string;
 };
 
-export type PunkRecordPage<T> = {
+export type DevilFruitPage<T> = {
   data: T[];
   page: number;
   limit: number;
@@ -23,29 +23,26 @@ function positiveInteger(value: number | undefined, fallback: number): number {
   return Number.isInteger(value) && (value as number) > 0 ? (value as number) : fallback;
 }
 
-export function normalizePunkRecordQuery(query: PunkRecordListQuery) {
+export function normalizeDevilFruitQuery(query: DevilFruitListQuery) {
   return {
     page: positiveInteger(query.page, DEFAULT_PAGE),
     limit: Math.min(positiveInteger(query.limit, DEFAULT_LIMIT), MAX_LIMIT),
     search: query.search?.trim() || undefined,
-    category: query.category?.trim() || undefined,
+    type: query.type?.trim() || undefined,
   };
 }
 
-export async function listPunkRecords(
+export async function listDevilFruits(
   prisma: PrismaClient,
-  query: PunkRecordListQuery = {},
-): Promise<PunkRecordPage<unknown>> {
-  const normalized = normalizePunkRecordQuery(query);
+  query: DevilFruitListQuery = {},
+): Promise<DevilFruitPage<unknown>> {
+  const normalized = normalizeDevilFruitQuery(query);
   const skip = (normalized.page - 1) * normalized.limit;
-  const model = (prisma as unknown as { punkRecord: {
-    findMany(args: unknown): Promise<unknown[]>;
-    count(args: unknown): Promise<number>;
-  } }).punkRecord;
-
-  const where: Record<string, unknown> = {};
-  if (normalized.search) where.name = { contains: normalized.search, mode: 'insensitive' };
-  if (normalized.category) where.category = normalized.category;
+  const model = prisma.devilFruit;
+  const where = {
+    ...(normalized.search ? { name: { contains: normalized.search, mode: 'insensitive' as const } } : {}),
+    ...(normalized.type ? { type: normalized.type } : {}),
+  };
 
   const [data, total] = await Promise.all([
     model.findMany({ where, skip, take: normalized.limit, orderBy: { name: 'asc' } }),
@@ -55,7 +52,6 @@ export async function listPunkRecords(
   return { data, page: normalized.page, limit: normalized.limit, total, totalPages: Math.ceil(total / normalized.limit) };
 }
 
-export async function getPunkRecordById(prisma: PrismaClient, id: string): Promise<unknown | null> {
-  const model = (prisma as unknown as { punkRecord: { findUnique(args: unknown): Promise<unknown | null> } }).punkRecord;
-  return model.findUnique({ where: { id } });
+export function getDevilFruitByExternalId(prisma: PrismaClient, externalId: number) {
+  return prisma.devilFruit.findUnique({ where: { externalId } });
 }
