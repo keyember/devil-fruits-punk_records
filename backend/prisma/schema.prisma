@@ -35,6 +35,7 @@ model DevilFruit {
   id              Int               @id @default(autoincrement())
   externalId      Int               @unique
   name            String
+  originalName    String?
   romanizedName   String?
   type            String?
   description     String?
