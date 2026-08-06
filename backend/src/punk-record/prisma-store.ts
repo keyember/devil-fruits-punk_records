@@ -2,6 +2,7 @@ import type { PrismaClient } from '../generated/prisma/client.js';
 import type { PunkRecordEntity, PunkRecordResource, SyncStore } from './types.js';
 
 type PrismaModelDelegate = {
+  findUnique(args: { where: Record<string, unknown> }): Promise<unknown | null>;
   upsert(args: { where: Record<string, unknown>; create: Record<string, unknown>; update: Record<string, unknown> }): Promise<unknown>;
 };
 
@@ -66,21 +67,26 @@ function toDatabaseRecord(entity: PunkRecordEntity, resource: PunkRecordResource
 
 export class PrismaPunkRecordStore<T extends PunkRecordEntity> implements SyncStore<T> {
   private readonly delegate: PrismaModelDelegate;
+  private readonly resource: PunkRecordResource;
 
   constructor(prisma: PrismaClient, resource: PunkRecordResource) {
     const delegate = (prisma as unknown as Record<string, PrismaModelDelegate>)[modelNames[resource]];
     if (!delegate) throw new Error(`Missing Prisma delegate for resource ${resource}`);
     this.delegate = delegate;
+    this.resource = resource;
   }
 
   async upsert(entity: T): Promise<'created' | 'updated'> {
-    const data = toDatabaseRecord(entity, 'devil-fruits');
-    const result = await this.delegate.upsert({
-      where: { externalId: data.externalId },
+    const data = toDatabaseRecord(entity, this.resource);
+    const where = { externalId: data.externalId };
+    const existing = await this.delegate.findUnique({ where });
+
+    await this.delegate.upsert({
+      where,
       create: data,
       update: data,
     });
 
-    return result ? 'updated' : 'created';
+    return existing ? 'updated' : 'created';
   }
 }
