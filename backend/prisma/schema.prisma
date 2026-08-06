@@ -1,43 +1,272 @@
-// schema.prisma — PUNK RECORDS DATABASE
-// Dr. Vegapunk Devil Fruit Classification System
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+model Character {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  romanizedName   String?
+  nickname        String?
+  description     String?
+  imageUrl        String?
+  bounty          BigInt?
+  height          String?
+  birthday        String?
+  status          String?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  fruits          CharacterFruit[]
+  crews           CharacterCrew[]
+  organizations   CharacterOrganization[]
+  ships           CharacterShip[]
+  islands         CharacterIsland[]
+  arcs            CharacterArc[]
+  episodes        CharacterEpisode[]
 }
 
 model DevilFruit {
-  id             String   @id @default(cuid())
-  originalName   String   @unique   // Ex: "Mera Mera no Mi"
-  translatedName String             // Ex: "Fruit du Feu"
-  type           FruitType          // PARAMECIA | LOGIA | ZOAN
-  description    String   @db.Text
-  ability        String   @db.Text
-  imageUrl       String?
-  rarity         Rarity   @default(COMMON)
-  user           String?            // Utilisateur connu (ex: Portgas D. Ace)
-  bounty         String?            // Prime en Berrys (format string: "3 000 000 000")
-
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@map("devil_fruits")
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  romanizedName   String?
+  type            String?
+  description     String?
+  imageUrl        String?
+  status          String?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  users           CharacterFruit[]
 }
 
-enum FruitType {
-  Paramecia
-  Logia
-  Zoan
+model Crew {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  description     String?
+  imageUrl        String?
+  status          String?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  members         CharacterCrew[]
+  ships           CrewShip[]
 }
 
-enum Rarity {
-  COMMON
-  UNCOMMON
-  RARE
-  LEGENDARY
-  MYTHIC
+model Island {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  description     String?
+  imageUrl        String?
+  sea             String?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  characters      CharacterIsland[]
+}
+
+model Organization {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  description     String?
+  imageUrl        String?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  members         CharacterOrganization[]
+}
+
+model Ship {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  description     String?
+  imageUrl        String?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  crews           CrewShip[]
+  characters      CharacterShip[]
+}
+
+model Saga {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String
+  description     String?
+  imageUrl        String?
+  order           Int?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  arcs            Arc[]
+}
+
+model Arc {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  sagaId          Int?
+  name            String
+  description     String?
+  imageUrl        String?
+  order           Int?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  saga            Saga?             @relation(fields: [sagaId], references: [id], onDelete: SetNull)
+  chapters        Chapter[]
+  characters      CharacterArc[]
+  episodes        Episode[]
+}
+
+model Chapter {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  arcId           Int?
+  name            String?
+  number          Int?
+  releaseDate     DateTime?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  arc             Arc?              @relation(fields: [arcId], references: [id], onDelete: SetNull)
+}
+
+model Volume {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  name            String?
+  number          Int?
+  description     String?
+  imageUrl        String?
+  releaseDate     DateTime?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Episode {
+  id              Int               @id @default(autoincrement())
+  externalId      Int               @unique
+  arcId           Int?
+  name            String?
+  number          Int?
+  description     String?
+  imageUrl        String?
+  releaseDate     DateTime?
+  rawData         Json?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  arc             Arc?              @relation(fields: [arcId], references: [id], onDelete: SetNull)
+  characters      CharacterEpisode[]
+}
+
+model CharacterFruit {
+  characterId     Int
+  fruitId         Int
+  role            String?
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  fruit           DevilFruit        @relation(fields: [fruitId], references: [id], onDelete: Cascade)
+  @@id([characterId, fruitId])
+}
+
+model CharacterCrew {
+  characterId     Int
+  crewId          Int
+  role            String?
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  crew            Crew              @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  @@id([characterId, crewId])
+}
+
+model CharacterOrganization {
+  characterId     Int
+  organizationId  Int
+  role            String?
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@id([characterId, organizationId])
+}
+
+model CharacterShip {
+  characterId     Int
+  shipId          Int
+  role            String?
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  ship            Ship              @relation(fields: [shipId], references: [id], onDelete: Cascade)
+  @@id([characterId, shipId])
+}
+
+model CharacterIsland {
+  characterId     Int
+  islandId        Int
+  relation        String?
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  island          Island            @relation(fields: [islandId], references: [id], onDelete: Cascade)
+  @@id([characterId, islandId])
+}
+
+model CharacterArc {
+  characterId     Int
+  arcId           Int
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  arc             Arc               @relation(fields: [arcId], references: [id], onDelete: Cascade)
+  @@id([characterId, arcId])
+}
+
+model CharacterEpisode {
+  characterId     Int
+  episodeId       Int
+  character       Character         @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  episode         Episode           @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  @@id([characterId, episodeId])
+}
+
+model CrewShip {
+  crewId          Int
+  shipId          Int
+  role            String?
+  crew            Crew              @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  ship            Ship              @relation(fields: [shipId], references: [id], onDelete: Cascade)
+  @@id([crewId, shipId])
+}
+
+model SyncRun {
+  id              Int               @id @default(autoincrement())
+  resource        String
+  status          SyncStatus        @default(RUNNING)
+  fetched         Int               @default(0)
+  created         Int               @default(0)
+  updated         Int               @default(0)
+  failed          Int               @default(0)
+  errors          Json?
+  startedAt       DateTime          @default(now())
+  finishedAt      DateTime?
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  PARTIAL
+  FAILED
 }
