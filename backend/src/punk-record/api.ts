@@ -1,5 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
-
+import type { PrismaClient } from "../generated/prisma/client.js";
 export type DevilFruitListQuery = {
   page?: number;
   limit?: number;
@@ -20,7 +19,9 @@ const DEFAULT_LIMIT = 24;
 const MAX_LIMIT = 100;
 
 function positiveInteger(value: number | undefined, fallback: number): number {
-  return Number.isInteger(value) && (value as number) > 0 ? (value as number) : fallback;
+  return Number.isInteger(value) && (value as number) > 0
+    ? (value as number)
+    : fallback;
 }
 
 export function normalizeDevilFruitQuery(query: DevilFruitListQuery) {
@@ -40,18 +41,34 @@ export async function listDevilFruits(
   const skip = (normalized.page - 1) * normalized.limit;
   const model = prisma.devilFruit;
   const where = {
-    ...(normalized.search ? { name: { contains: normalized.search, mode: 'insensitive' as const } } : {}),
+    ...(normalized.search
+      ? { name: { contains: normalized.search, mode: "insensitive" as const } }
+      : {}),
     ...(normalized.type ? { type: normalized.type } : {}),
   };
 
   const [data, total] = await Promise.all([
-    model.findMany({ where, skip, take: normalized.limit, orderBy: { name: 'asc' } }),
+    model.findMany({
+      where,
+      skip,
+      take: normalized.limit,
+      orderBy: { name: "asc" },
+    }),
     model.count({ where }),
   ]);
 
-  return { data, page: normalized.page, limit: normalized.limit, total, totalPages: Math.ceil(total / normalized.limit) };
+  return {
+    data,
+    page: normalized.page,
+    limit: normalized.limit,
+    total,
+    totalPages: Math.ceil(total / normalized.limit),
+  };
 }
 
-export function getDevilFruitByExternalId(prisma: PrismaClient, externalId: number) {
+export function getDevilFruitByExternalId(
+  prisma: PrismaClient,
+  externalId: number,
+) {
   return prisma.devilFruit.findUnique({ where: { externalId } });
 }

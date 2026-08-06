@@ -1,23 +1,23 @@
-import express from 'express';
-import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import 'dotenv/config';
-import { createDevilFruitRouter } from './src/punk-record/routes.js';
+import express from "express";
+import cors from "cors";
+import { PrismaClient } from "./src/generated/prisma/client.js";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import "dotenv/config";
+import { createDevilFruitRouter } from "./src/punk-record/routes.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error('DATABASE_URL is required');
+if (!connectionString) throw new Error("DATABASE_URL is required");
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
 
-app.use('/api/punk-records', createDevilFruitRouter(prisma));
+app.use("/api/punk-records", createDevilFruitRouter(prisma));
 
 const port = Number(process.env.PORT ?? 3000);
 const server = app.listen(port, () => {
@@ -30,5 +30,5 @@ async function shutdown() {
   await pool.end();
 }
 
-process.once('SIGINT', shutdown);
-process.once('SIGTERM', shutdown);
+process.once("SIGINT", shutdown);
+process.once("SIGTERM", shutdown);
