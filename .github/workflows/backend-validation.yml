@@ -6,7 +6,7 @@ on:
       - feat/full-punk-record
   pull_request:
     branches:
-      - feat/full-punk-record
+      - main
 
 permissions:
   contents: read
