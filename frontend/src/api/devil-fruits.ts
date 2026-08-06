@@ -8,23 +8,14 @@ export type ApiDevilFruit = {
   status?: string | null;
 };
 
-export type DevilFruitPage = {
-  data: ApiDevilFruit[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-};
-
 export type DisplayDevilFruit = {
   id: string;
   originalName: string;
   translatedName: string;
-  type: 'Paramecia' | 'Logia' | 'Zoan';
+  type: string;
   description: string;
   ability: string;
   imageUrl?: string | null;
-  user?: string;
 };
 
 export type DisplayDevilFruitPage = {
@@ -37,33 +28,36 @@ export type DisplayDevilFruitPage = {
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
-function normalizeType(type: string | null | undefined): DisplayDevilFruit['type'] {
-  if (type?.toLowerCase().includes('logia')) return 'Logia';
-  if (type?.toLowerCase().includes('zoan')) return 'Zoan';
-  return 'Paramecia';
-}
-
 function mapDevilFruit(fruit: ApiDevilFruit): DisplayDevilFruit {
   return {
     id: String(fruit.externalId),
-    originalName: fruit.name,
-    translatedName: fruit.romanizedName ?? fruit.name,
-    type: normalizeType(fruit.type),
-    description: fruit.description ?? 'Données manquantes dans les archives.',
+    originalName: fruit.name.trim(),
+    translatedName: fruit.romanizedName ?? fruit.name.trim(),
+    type: fruit.type?.trim() || 'Inconnu',
+    description: fruit.description?.trim() || 'Données manquantes dans les archives.',
     ability: fruit.status ?? 'Capacité non renseignée.',
     imageUrl: fruit.imageUrl,
   };
 }
 
-export async function fetchDevilFruitPage(page = 1, limit = 24): Promise<DisplayDevilFruitPage> {
+export async function fetchDevilFruitPage(
+  page = 1,
+  limit = 24,
+  filters: { search?: string; type?: string } = {},
+): Promise<DisplayDevilFruitPage> {
   const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (filters.search?.trim()) params.set('search', filters.search.trim());
+  if (filters.type && filters.type !== 'all') params.set('type', filters.type);
+
   const response = await fetch(`${API_URL}/api/punk-records/devil-fruits?${params}`);
   if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
 
-  const payload = (await response.json()) as DevilFruitPage;
+  const payload = (await response.json()) as {
+    data: ApiDevilFruit[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
   return { ...payload, data: payload.data.map(mapDevilFruit) };
-}
-
-export async function fetchDevilFruits(): Promise<DisplayDevilFruit[]> {
-  return (await fetchDevilFruitPage(1, 100)).data;
 }
