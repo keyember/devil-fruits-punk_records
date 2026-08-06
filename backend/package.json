@@ -1,25 +1,27 @@
 {
+  "name": "devil-fruits-backend",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-  "start": "npx prisma generate && npx tsx index.ts"
-},
+    "dev": "tsx watch server.ts",
+    "start": "tsx server.ts",
+    "build": "tsc",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "sync:priority": "tsx src/punk-record/cli.ts"
+  },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
-    "axios": "^1.13.6",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "framer-motion": "^12.36.0",
-    "node-fetch": "^3.3.2",
-    "prisma": "^7.5.0"
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.5.0",
-    "@types/pg": "^8.18.0"
-  },
-  "engines": {
-    "node": ">=20.0.0"
+    "@types/node": "^24.10.1",
+    "prisma": "^7.5.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   }
 }
