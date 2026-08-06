@@ -17,7 +17,17 @@ const client = new OnePieceClient({
 
 try {
   const results = await syncAll(prisma, client, ['devil-fruits']);
-  console.table(results.map(({ resource, fetched, created, updated, failed }) => ({ resource, fetched, created, updated, failed })));
+  for (const result of results) {
+    console.table({
+      resource: result.resource,
+      fetched: result.fetched,
+      created: result.created,
+      updated: result.updated,
+      failed: result.failed,
+      errors: result.errors.length,
+    });
+    if (result.errors.length > 0) console.table(result.errors);
+  }
 } catch (error) {
   console.error('Punk Records synchronization failed', error);
   process.exitCode = 1;
