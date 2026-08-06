@@ -1,4 +1,4 @@
-import type { PunkRecordEntity, PunkRecordResource } from './types';
+import type { PunkRecordEntity, PunkRecordResource } from './types.js';
 
 export interface OnePieceClientOptions {
   baseUrl: string;
@@ -16,6 +16,20 @@ export class OnePieceApiError extends Error {
   }
 }
 
+const remoteResources: Record<PunkRecordResource, string> = {
+  characters: 'characters',
+  crews: 'crews',
+  'devil-fruits': 'fruits',
+  islands: 'islands',
+  organizations: 'organizations',
+  ships: 'ships',
+  sagas: 'sagas',
+  arcs: 'arcs',
+  chapters: 'chapters',
+  volumes: 'volumes',
+  episodes: 'episodes',
+};
+
 export class OnePieceClient {
   private readonly fetcher: typeof fetch;
   private readonly language: string;
@@ -27,7 +41,7 @@ export class OnePieceClient {
 
   async list<T extends PunkRecordEntity>(resource: PunkRecordResource): Promise<T[]> {
     const url = new URL(
-      `/v2/${resource}/${this.language}`,
+      `/v2/${remoteResources[resource]}/${this.language}`,
       this.options.baseUrl.endsWith('/') ? this.options.baseUrl : `${this.options.baseUrl}/`,
     );
     const response = await this.fetcher(url, { headers: { accept: 'application/json' } });
